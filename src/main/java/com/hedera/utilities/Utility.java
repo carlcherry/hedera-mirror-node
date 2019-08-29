@@ -7,11 +7,14 @@ import com.google.gson.JsonSyntaxException;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.TextFormat;
+import com.hedera.configLoader.ConfigLoader;
 import com.hedera.downloader.Downloader;
+import com.hedera.recordFileLogger.RecordFileLogger;
 import com.hederahashgraph.api.proto.java.AccountID;
 import com.hederahashgraph.api.proto.java.Timestamp;
 import com.hederahashgraph.api.proto.java.Transaction;
 import com.hederahashgraph.api.proto.java.TransactionBody;
+import com.hederahashgraph.api.proto.java.TransactionRecord;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,6 +48,8 @@ public class Utility {
 	private static final Marker LOGM_EXCEPTION = MarkerManager.getMarker("EXCEPTION");
   private static final Long SCALAR = 1_000_000_000L;
 
+	static final int RECORD_FORMAT_VERSION = 2;
+
 	private static final byte TYPE_PREV_HASH = 1;       // next 48 bytes are hash384 of previous files
 	private static final byte TYPE_RECORD = 2;          // next data type is transaction and its record
 	private static final byte TYPE_SIGNATURE = 3;       // the file content signature, should not be hashed
@@ -56,11 +61,18 @@ public class Utility {
 		return stopFile.exists();
 	}
 	/**
-	 * Verify if a .rcd file's hash is equal to the hash contained in .rcd_sig file
+	 * Verify if a  file's hash is equal to the hash contained in sig file
 	 * @return
 	 */
-	public static boolean hashMatch(File sigFile, File rcdFile) {
-		byte[] fileHash = Utility.getFileHash(rcdFile.getPath());
+	public static boolean hashMatch(File sigFile, File file) {
+		byte[] fileHash;
+		if (isRecordFile(file.getPath())) {
+			fileHash = Utility.getRecordFileHash(file.getPath());
+		} else if (isEventStreamFile(file.getPath())) {
+			fileHash = Utility.getFileHash(file.getPath());
+		} else {
+			fileHash = Utility.getFileHash(file.getPath());
+		}
 		return Arrays.equals(fileHash, extractHashAndSigFromFile(sigFile).getLeft());
 	}
 	/**
@@ -156,6 +168,93 @@ public class Utility {
 			return null;
 		}
 	}
+
+	/**
+	 * Calculate SHA384 hash of a recordStream file
+	 *
+	 * @param fileName
+	 * 		file name
+	 * @return byte array of hash value
+	 */
+	public static byte[] getRecordFileHash(String fileName) {
+		try (FileInputStream stream = new FileInputStream(new File(fileName)); DataInputStream dis =
+				new DataInputStream(
+				stream)) {
+			MessageDigest md = MessageDigest.getInstance("SHA-384");
+			MessageDigest mdForContent = MessageDigest.getInstance("SHA-384");
+
+			byte[] prevFileHash = new byte[48];
+
+			int record_format_version = dis.readInt();
+			int version = dis.readInt();
+
+			md.update(integerToBytes(record_format_version));
+			md.update(integerToBytes(version));
+
+			log.info(MARKER, "Record file format version " + record_format_version);
+			log.info(MARKER, "HAPI protocol version " + version);
+
+			while (dis.available() != 0) {
+				byte typeDelimiter = dis.readByte();
+				switch (typeDelimiter) {
+					case TYPE_PREV_HASH:
+						md.update(typeDelimiter);
+						dis.read(prevFileHash);
+						md.update(prevFileHash);
+						break;
+					case TYPE_RECORD:
+
+						int byteLength = dis.readInt();
+						byte[] rawBytes = new byte[byteLength];
+						dis.readFully(rawBytes);
+						if (record_format_version >= RECORD_FORMAT_VERSION) {
+							mdForContent.update(typeDelimiter);
+							mdForContent.update(Utility.integerToBytes(byteLength));
+							mdForContent.update(rawBytes);
+						} else {
+							md.update(typeDelimiter);
+							md.update(Utility.integerToBytes(byteLength));
+							md.update(rawBytes);
+						}
+
+						byteLength = dis.readInt();
+						rawBytes = new byte[byteLength];
+						dis.readFully(rawBytes);
+
+						if (record_format_version >= RECORD_FORMAT_VERSION) {
+							mdForContent.update(Utility.integerToBytes(byteLength));
+							mdForContent.update(rawBytes);
+
+						} else {
+							md.update(Utility.integerToBytes(byteLength));
+							md.update(rawBytes);
+						}
+						break;
+
+					default:
+						log.error(LOGM_EXCEPTION, "Exception Unknown record file delimiter {}", typeDelimiter);
+				}
+			}
+			if (record_format_version >= RECORD_FORMAT_VERSION) {
+				md.update(mdForContent.digest());
+			}
+			return md.digest();
+		} catch (Exception e) {
+			log.error(LOGM_EXCEPTION, "Exception {}", e);
+			return null;
+		}
+	}
+
+//	/**
+//	 * Calculate SHA384 hash of a eventStream file
+//	 *
+//	 * @param fileName
+//	 * 		file name
+//	 * @return byte array of hash value
+//	 */
+//	public static byte[] getEventFileHash(String fileName) {
+//
+//	}
 
 	public static AccountID stringToAccountID(final String string) throws IllegalArgumentException{
 		if (string == null || string.isEmpty()) {
