@@ -1,7 +1,7 @@
 version: 2
 
 defaults: &defaults
-  docker:
+  machine:
     - image: adoptopenjdk:11-jdk-hotspot
 
 references:
@@ -81,8 +81,6 @@ jobs:
 
   perf_test:
     <<: *defaults
-    machine:
-      enabled: true
     steps:
       - add_ssh_keys:
           fingerprints:
