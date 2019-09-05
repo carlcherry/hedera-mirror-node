@@ -38,6 +38,9 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - run:
+          name: Perms
+          run: ls -la /root
       - restore_cache:
           keys:
             - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
