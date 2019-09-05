@@ -40,7 +40,7 @@ jobs:
       - checkout
       - run:
           name: Perms
-          command: sudo ls -la /root
+          command: sudo ls -la /root; whoami
       - restore_cache:
           keys:
             - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
