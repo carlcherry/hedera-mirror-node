@@ -45,12 +45,12 @@ jobs:
           name: Check Java version
           command: java -version
       - run:
-          name: Install Java 10
+          name: Install Java 11
           command: |
             curl -s "https://get.sdkman.io" | bash
             source "$HOME/.sdkman/bin/sdkman-init.sh"
-            sdk install java 10.0.2-open
-            sdk default java 10.0.2-open
+            sdk install java 11.0.2-open
+            sdk default java 11.0.2-open
       - restore_cache:
           keys:
             - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
