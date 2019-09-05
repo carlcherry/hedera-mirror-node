@@ -59,6 +59,7 @@ jobs:
       - run:
           name: Running maven
           command: |
+            sdk default java 11.0.2-open
             ./mvnw --version
             ./mvnw install
       - store_test_results:
