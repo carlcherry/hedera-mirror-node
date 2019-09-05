@@ -39,11 +39,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Perms
-          command: sudo ls -la /root; whoami; sudo chmod -R 777 /root
-      - run:
-          name: Check Java version
-          command: java -version
+          name: Set correct permissions for our .m2 cache folder
+          command: sudo chmod -R 777 /root
       - run:
           name: Install Java 11
           command: |
@@ -61,7 +58,6 @@ jobs:
           name: Running maven
           command: |
             source ~/.bashrc
-            sdk default java 11.0.2-open
             ./mvnw --version
             ./mvnw install
       - store_test_results:
@@ -100,6 +96,7 @@ jobs:
   perf_test:
     <<: *defaults
     steps:
+      - *attach_workspace
       - add_ssh_keys:
           fingerprints:
             - "0f:b0:7b:39:f1:10:2e:87:86:8a:75:3f:0a:5a:6b:51"
