@@ -2,7 +2,7 @@ version: 2
 
 defaults: &defaults
   machine:
-    - image: adoptopenjdk:11-jdk-hotspot
+    image: ubuntu-1604:201903-01 
 
 references:
   workspace_root: &workspace_root
