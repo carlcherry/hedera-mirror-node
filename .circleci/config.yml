@@ -48,7 +48,8 @@ jobs:
           name: Install Java 11
           command: |
             curl -s "https://get.sdkman.io" | bash
-            source "$HOME/.sdkman/bin/sdkman-init.sh"
+            echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.bashrc
+            source ~/.bashrc
             sdk install java 11.0.2-open
             sdk default java 11.0.2-open
       - restore_cache:
