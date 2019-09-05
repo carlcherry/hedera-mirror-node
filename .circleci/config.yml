@@ -60,6 +60,7 @@ jobs:
       - run:
           name: Running maven
           command: |
+            source ~/.bashrc
             sdk default java 11.0.2-open
             ./mvnw --version
             ./mvnw install
