@@ -29,6 +29,9 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v.*/
+      - perf_test:
+          requires:
+            - build
 
 jobs:
   build:
