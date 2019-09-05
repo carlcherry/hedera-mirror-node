@@ -41,6 +41,9 @@ jobs:
       - run:
           name: Perms
           command: sudo ls -la /root; whoami; sudo chmod -R 777 /root
+      - run:
+          name: Check Java version
+          command: java -version
       - restore_cache:
           keys:
             - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
