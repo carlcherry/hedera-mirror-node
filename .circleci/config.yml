@@ -96,6 +96,6 @@ jobs:
           name: Deploy over SSH to Performance Test Server
           command: |
             scp /tmp/workspace/mirror-node.tgz $SSH_USER@$SSH_HOST:~
-            ssh $SSH_USER@$SSH_HOST "ROOT_DIR=`tar zxvf mirror-node.tgz | sed -e 's@/.*@@' | uniq`; \
+            ssh $SSH_USER@$SSH_HOST "ROOT_DIR=`tar zxvf ~/mirror-node.tgz | sed -e 's@/.*@@' | uniq`; \
               cd $ROOT_DIR; \
               ./scripts/deploy-mirror-node.sh"
