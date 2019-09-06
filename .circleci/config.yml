@@ -45,10 +45,7 @@ jobs:
             - maven-v1-
       - run:
           name: Running maven
-          command: |
-            source ~/.bashrc
-            ./mvnw --version
-            ./mvnw install
+          command: ./mvnw install
       - store_test_results:
           path: target/surefire-reports
       - save_cache:
