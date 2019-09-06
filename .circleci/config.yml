@@ -1,8 +1,12 @@
 version: 2
 
-defaults: &defaults
-  machine:
-    image: ubuntu-1604:201903-01 
+executors:
+  docker_jdk:
+    docker:
+      - image: adoptopenjdk:11-jdk-hotspot
+  vm_ubuntu:
+    machine:
+      image: vm_ubuntu-1604:201903-01 
 
 references:
   workspace_root: &workspace_root
@@ -35,7 +39,7 @@ workflows:
 
 jobs:
   build:
-    <<: *defaults
+    executor: docker_jdk
     steps:
       - checkout
       - run:
@@ -80,7 +84,7 @@ jobs:
             - mirror-node
 
   release_artifacts:
-    <<: *defaults
+    executor: docker_jdk
     steps:
       - *attach_workspace
       - run:
@@ -94,7 +98,7 @@ jobs:
           path: /tmp/mirror-node.tgz
 
   perf_test:
-    <<: *defaults
+    executor: vm_ubuntu
     steps:
       - *attach_workspace
       - add_ssh_keys:
