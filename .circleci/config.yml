@@ -93,9 +93,12 @@ jobs:
           fingerprints:
             - "0f:b0:7b:39:f1:10:2e:87:86:8a:75:3f:0a:5a:6b:51"
       - run:
-          name: Deploy over SSH to Performance Test Server
+          name: Send build artifact to Perf Test Server
           command: |
             scp /tmp/workspace/mirror-node.tgz $SSH_USER@$SSH_HOST:~
+      - run:
+          name: Run deploy script over SSH
+          command: |
             ssh $SSH_USER@$SSH_HOST "ROOT_DIR=`tar zxvf ~/mirror-node.tgz | sed -e 's@/.*@@' | uniq`; \
               cd $ROOT_DIR; \
               ./scripts/deploy-mirror-node.sh"
