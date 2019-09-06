@@ -96,6 +96,6 @@ jobs:
           name: Deploy over SSH to Performance Test Server
           command: |
             scp /tmp/workspace/mirror-node.tgz $SSH_USER@$SSH_HOST:~
-            ssh $SSH_USER@$SSH_HOST "mkdir -p mirror-node \
-              tar zxvf mirror-node.tgz --strip 1 -C mirror-node \
+            ssh $SSH_USER@$SSH_HOST "mkdir -p mirror-node; \
+              tar zxvf mirror-node.tgz --strip 1 -C mirror-node; \
               cd mirror-node"
