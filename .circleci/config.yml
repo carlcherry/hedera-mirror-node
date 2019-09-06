@@ -38,17 +38,6 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run:
-          name: Set correct permissions for our .m2 cache folder
-          command: sudo chmod -R 777 /root
-      - run:
-          name: Install Java 11
-          command: |
-            curl -s "https://get.sdkman.io" | bash
-            echo 'source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.bashrc
-            source ~/.bashrc
-            sdk install java 11.0.2-open
-            sdk default java 11.0.2-open
       - restore_cache:
           keys:
             - maven-v1-{{ .Branch }}-{{ checksum "pom.xml" }}
