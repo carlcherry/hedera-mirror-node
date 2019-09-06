@@ -99,6 +99,6 @@ jobs:
       - run:
           name: Run deploy script over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST "ROOT_DIR=`tar zxvf ~/mirror-node.tgz | sed -e 's@/.*@@' | uniq`; \
+            ssh $SSH_USER@$SSH_HOST "ROOT_DIR=`tar zxvf /home/$SSH_USER/mirror-node.tgz | sed -e 's@/.*@@' | uniq`; \
               cd $ROOT_DIR; \
               ./scripts/deploy-mirror-node.sh"
