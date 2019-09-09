@@ -105,4 +105,4 @@ jobs:
       - run:
           name: Run deploy script over SSH
           command: |
-            ssh $SSH_USER@$SSH_HOST "./ci/setup.sh; ./ci/testperformance.sh; ./ci/teardown.sh"
+            ssh $SSH_USER@$SSH_HOST "./ci/setup.sh; ./ci/testdata.sh; ./ci/testperformance.sh; ./ci/teardown.sh"
