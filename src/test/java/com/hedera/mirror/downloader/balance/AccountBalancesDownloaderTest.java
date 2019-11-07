@@ -72,8 +72,8 @@ public class AccountBalancesDownloaderTest {
         commonDownloaderProperties = new CommonDownloaderProperties();
         commonDownloaderProperties.setBucketName("test");
         commonDownloaderProperties.setCloudProvider(CommonDownloaderProperties.CloudProvider.LOCAL);
-        commonDownloaderProperties.setAccessKey("x"); // https://github.com/findify/s3mock/issues/147
-        commonDownloaderProperties.setSecretKey("x");
+        commonDownloaderProperties.setAwsAccessKey("x"); // https://github.com/findify/s3mock/issues/147
+        commonDownloaderProperties.setAwsSecretKey("x");
         downloaderProperties = new BalanceDownloaderProperties(mirrorProperties, commonDownloaderProperties);
         downloaderProperties.init();
         networkAddressBook = new NetworkAddressBook(mirrorProperties);
